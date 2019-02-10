@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
-import { reduce, map, first } from 'rxjs/operators';
+import { reduce, map, first, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +15,7 @@ export class AppComponent implements OnInit, OnDestroy {
   timeoutSubscription: Subscription;
   lgSubscription: Subscription;
   firstFromSubscription: Subscription;
+  withDelaySubscription: Subscription;
 
   ngOnInit() {
     // Task 1:
@@ -42,13 +43,15 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(
         reduce((acc: number, value: number) => acc * value, 1)
       )
-      .subscribe(result => console.log(result));
+      .subscribe((result: number) => console.log(result));
 
     // Task 3:
     // Create an observable from window mouse clicks and show coordinates in console.
     console.log('task3: mouse clicks');
     this.coordsSubscription = fromEvent<MouseEvent>(document, 'click')
-      .subscribe(event => console.log(`x-coord: ${event.screenX}`, `y-coord: ${event.screenY}`));
+      .subscribe((event: MouseEvent) => 
+        console.log(`x-coord: ${event.screenX}`, `y-coord: ${event.screenY}`)
+      );
     
     // Task 4:
     // Convert a promise to an observable
@@ -78,6 +81,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.firstFromSubscription = from(['Richard', 'Erlich', 'Dinesh', 'Gilfoyle'])
       .pipe(first())
       .subscribe((name: string) => console.log(name));
+
+    // Task 8:
+    // Get value from Observable A, then emit Observable B
+    const A$: Observable<number> = of(0.5).pipe(delay(1500));
+    const B$: Observable<number> = of(100);
+    console.log('task8:');
+    this.withDelaySubscription = concat(A$, B$)
+      .subscribe((value: number) => console.log(`task8 async value: ${value}`));
   }
 
   ngOnDestroy() {
@@ -95,5 +106,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.lgSubscription.unsubscribe();
     // Task 7:
     this.firstFromSubscription.unsubscribe();
+    // Task 8:
+    this.withDelaySubscription.unsubscribe();
   }
 }
