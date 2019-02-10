@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
 import { reduce } from 'rxjs/operators';
-import { pipe } from '@angular/core/src/render3';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +8,11 @@ import { pipe } from '@angular/core/src/render3';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'rd-lab-task';
   fromSubscription: Subscription;
   ofSubscription: Subscription;
   concatSubscription: Subscription;
   coordsSubscription: Subscription;
+  timeoutSubscription: Subscription;
 
   ngOnInit() {
     // Task 1:
@@ -48,6 +47,17 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log('task3: mouse clicks');
     this.coordsSubscription = fromEvent<MouseEvent>(document, 'click')
       .subscribe(event => console.log(`x-coord: ${event.screenX}`, `y-coord: ${event.screenY}`));
+    
+    // Task 4:
+    // Convert a promise to an observable
+    const promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('resolved!')
+      }, 1000)
+    });
+    console.log('task4: from promise');
+    this.timeoutSubscription = from(promise)
+      .subscribe(result => console.log(result));
   }
 
   ngOnDestroy() {
@@ -59,5 +69,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.concatSubscription.unsubscribe();
     // Task 3:
     this.coordsSubscription.unsubscribe();
+    // Task 4:
+    this.timeoutSubscription.unsubscribe();
   }
 }
