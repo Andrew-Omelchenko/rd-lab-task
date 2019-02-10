@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
+import { Observable, Observer, Subscription, from, of, concat, fromEvent } from 'rxjs';
 import { reduce, map, filter, first, delay } from 'rxjs/operators';
 
 @Component({
@@ -101,6 +101,24 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe((name: string) => console.log(name));
     this.subscriptions.push(strFilterSubscription);
+
+    // Task 10:
+    // Handle an error and show previous results in console
+    const observable: Observable<string> = Observable
+      .create((observer: Observer<string>) => {
+        observer.next('good');
+        observer.next('great');
+        observer.next('grand');
+        throw 'catch me!';
+        observer.next('wonderful');
+      });
+    console.log('task10: with error thown');
+    const withErrorSubscription = observable
+      .subscribe(
+        (wellness: string) => console.log(`good message: ${wellness}`),
+        (error: string) => console.log(`error thrown: ${error}`)
+      );
+    this.subscriptions.push(withErrorSubscription);
   }
 
   ngOnDestroy() {
