@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
-import { reduce } from 'rxjs/operators';
+import { reduce, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +13,7 @@ export class AppComponent implements OnInit, OnDestroy {
   concatSubscription: Subscription;
   coordsSubscription: Subscription;
   timeoutSubscription: Subscription;
+  lgSubscription: Subscription;
 
   ngOnInit() {
     // Task 1:
@@ -57,7 +58,18 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     console.log('task4: from promise');
     this.timeoutSubscription = from(promise)
-      .subscribe(result => console.log(result));
+      .subscribe((result: string) => console.log('Async task4 result: ', result));
+
+    // Task 6:
+    // Create observable of array, map each value to logarithm and show result in console.
+    // [10, 100, 1000]
+    const arr2: Array<number> = [10, 100, 1000];
+    console.log('task6: map each value to logarithm');
+    this.lgSubscription = from(arr2)
+      .pipe(
+        map((val: number) => Math.log10(val))
+      )
+      .subscribe((lgVal: number) => console.log(lgVal));
   }
 
   ngOnDestroy() {
@@ -71,5 +83,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.coordsSubscription.unsubscribe();
     // Task 4:
     this.timeoutSubscription.unsubscribe();
+    // Task 6:
+    this.lgSubscription.unsubscribe();
   }
 }
