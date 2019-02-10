@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
-import { reduce, map, first, delay } from 'rxjs/operators';
+import { reduce, map, filter, first, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -90,6 +90,17 @@ export class AppComponent implements OnInit, OnDestroy {
     const withDelaySubscription = concat(A$, B$)
       .subscribe((value: number) => console.log(`task8 async value: ${value}`));
     this.subscriptions.push(withDelaySubscription);
+
+    // Task 9:
+    // Get values while the 'name' length === 5
+    const names: Observable<string> = of('Sharon', 'Sue', 'Sally', 'Steve');
+    console.log('task9: filter array of names');
+    const strFilterSubscription = names
+      .pipe(
+        filter((name: string) => name.length === 5)
+      )
+      .subscribe((name: string) => console.log(name));
+    this.subscriptions.push(strFilterSubscription);
   }
 
   ngOnDestroy() {
