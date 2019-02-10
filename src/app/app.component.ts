@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Observer, Subscription, from, of, concat, fromEvent } from 'rxjs';
-import { reduce, map, filter, first, delay } from 'rxjs/operators';
+import { reduce, map, mergeMap, switchMap, filter, first, delay, partition } from 'rxjs/operators';
+
+import { Notification } from './notification.model';
 
 @Component({
   selector: 'app-root',
@@ -112,13 +114,44 @@ export class AppComponent implements OnInit, OnDestroy {
         throw 'catch me!';
         observer.next('wonderful');
       });
-    console.log('task10: with error thown');
+    console.log('task10: with error thrown');
     const withErrorSubscription = observable
       .subscribe(
         (wellness: string) => console.log(`good message: ${wellness}`),
         (error: string) => console.log(`error thrown: ${error}`)
       );
     this.subscriptions.push(withErrorSubscription);
+
+    // Task 11:
+    const notifications: Array<Notification> = [ 
+      { userId: 1, name: 'A1', delay: 100 }, // should be shown
+      { userId: 1, name: 'A2', delay: 1500 }, // shouldn't be shown
+      { userId: 1, name: 'A3', delay: 2500 }, // shouldn't be shown
+      { userId: 1, name: 'A4', delay: 3500 }, // should be shown
+      { userId: 2, name: 'B1', delay: 200 }, // should be shown
+      { userId: 2, name: 'B2', delay: 300 }, // shouldn't be shown
+      { userId: 2, name: 'B3', delay: 3500 }, // should be shown
+    ];
+    console.log('task11:');  
+    const setOfDistinct = new Map<number, number>();
+    const notificationsSubscription = from(notifications)
+      .pipe(
+        mergeMap((notification: Notification) => {
+          return of(notification)
+            .pipe(
+              delay(notification.delay),
+              map((item: Notification) => {
+                const { userId, delay } = item;
+                if (setOfDistinct[userId] && delay - setOfDistinct[userId] <= 3000) return null;
+                setOfDistinct[userId] = delay;
+                return item;
+              }),
+              filter((item: Notification) => item !== null)
+            );
+        })
+      )
+      .subscribe((notification: Notification) => console.log(notification));
+    this.subscriptions.push(notificationsSubscription);
   }
 
   ngOnDestroy() {
