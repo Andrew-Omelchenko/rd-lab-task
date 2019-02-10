@@ -8,14 +8,7 @@ import { reduce, map, first, delay } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  fromSubscription: Subscription;
-  ofSubscription: Subscription;
-  concatSubscription: Subscription;
-  coordsSubscription: Subscription;
-  timeoutSubscription: Subscription;
-  lgSubscription: Subscription;
-  firstFromSubscription: Subscription;
-  withDelaySubscription: Subscription;
+  subscriptions: Array<Subscription> = [];
 
   ngOnInit() {
     // Task 1:
@@ -24,13 +17,15 @@ export class AppComponent implements OnInit, OnDestroy {
     // of([1,2,3])
     const arr: Array<number> = [1, 2, 3];
     console.log('task1: from() - flattened');
-    this.fromSubscription = from(arr)
+    const fromSubscription = from(arr)
       .subscribe((element: number) => console.log(element));
+    this.subscriptions.push(fromSubscription);
     console.log('task1: of() - unflattened');
-    this.ofSubscription = of(arr)
+    const ofSubscription = of(arr)
       .subscribe((arr: number[]) => {
         for (let elem in arr) console.log(elem);
       });
+    this.subscriptions.push(ofSubscription);
 
     // Task 2:
     // Combine the results and multiply they
@@ -39,19 +34,21 @@ export class AppComponent implements OnInit, OnDestroy {
     const getConversionRate$: Observable<number> = of(0.5);
     const getAmountToConvert$: Observable<number> = of(100);
     console.log('task2: combine and multiply');
-    this.concatSubscription = concat(getConversionRate$, getAmountToConvert$)
+    const concatSubscription = concat(getConversionRate$, getAmountToConvert$)
       .pipe(
         reduce((acc: number, value: number) => acc * value, 1)
       )
       .subscribe((result: number) => console.log(result));
+    this.subscriptions.push(concatSubscription);
 
     // Task 3:
     // Create an observable from window mouse clicks and show coordinates in console.
     console.log('task3: mouse clicks');
-    this.coordsSubscription = fromEvent<MouseEvent>(document, 'click')
+    const coordsSubscription = fromEvent<MouseEvent>(document, 'click')
       .subscribe((event: MouseEvent) => 
         console.log(`x-coord: ${event.screenX}`, `y-coord: ${event.screenY}`)
       );
+    this.subscriptions.push(coordsSubscription);
     
     // Task 4:
     // Convert a promise to an observable
@@ -61,52 +58,44 @@ export class AppComponent implements OnInit, OnDestroy {
       }, 1000)
     });
     console.log('task4: from promise');
-    this.timeoutSubscription = from(promise)
+    const timeoutSubscription = from(promise)
       .subscribe((result: string) => console.log('Async task4 result: ', result));
+    this.subscriptions.push(timeoutSubscription);
 
     // Task 6:
     // Create observable of array, map each value to logarithm and show result in console.
     // [10, 100, 1000]
     const arr2: Array<number> = [10, 100, 1000];
     console.log('task6: map each value to logarithm');
-    this.lgSubscription = from(arr2)
+    const lgSubscription = from(arr2)
       .pipe(
         map((val: number) => Math.log10(val))
       )
       .subscribe((lgVal: number) => console.log(lgVal));
+    this.subscriptions.push(lgSubscription);
 
     // Task 7:
     // Get only first value from Observable.
     console.log('task7: the first name');
-    this.firstFromSubscription = from(['Richard', 'Erlich', 'Dinesh', 'Gilfoyle'])
+    const firstFromSubscription = from(['Richard', 'Erlich', 'Dinesh', 'Gilfoyle'])
       .pipe(first())
       .subscribe((name: string) => console.log(name));
+    this.subscriptions.push(firstFromSubscription);
 
     // Task 8:
     // Get value from Observable A, then emit Observable B
     const A$: Observable<number> = of(0.5).pipe(delay(1500));
     const B$: Observable<number> = of(100);
     console.log('task8:');
-    this.withDelaySubscription = concat(A$, B$)
+    const withDelaySubscription = concat(A$, B$)
       .subscribe((value: number) => console.log(`task8 async value: ${value}`));
+    this.subscriptions.push(withDelaySubscription);
   }
 
   ngOnDestroy() {
     // Unsubscribe from Subscriptions
-    // Task 1:
-    this.fromSubscription.unsubscribe();
-    this.ofSubscription.unsubscribe();
-    // Task 2:
-    this.concatSubscription.unsubscribe();
-    // Task 3:
-    this.coordsSubscription.unsubscribe();
-    // Task 4:
-    this.timeoutSubscription.unsubscribe();
-    // Task 6:
-    this.lgSubscription.unsubscribe();
-    // Task 7:
-    this.firstFromSubscription.unsubscribe();
-    // Task 8:
-    this.withDelaySubscription.unsubscribe();
+    this.subscriptions.forEach(
+      (subscription: Subscription) => { subscription.unsubscribe(); }
+    );
   }
 }
