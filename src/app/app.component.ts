@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subscription, from, of, concat, fromEvent } from 'rxjs';
-import { reduce, map } from 'rxjs/operators';
+import { reduce, map, first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +14,7 @@ export class AppComponent implements OnInit, OnDestroy {
   coordsSubscription: Subscription;
   timeoutSubscription: Subscription;
   lgSubscription: Subscription;
+  firstFromSubscription: Subscription;
 
   ngOnInit() {
     // Task 1:
@@ -70,6 +71,13 @@ export class AppComponent implements OnInit, OnDestroy {
         map((val: number) => Math.log10(val))
       )
       .subscribe((lgVal: number) => console.log(lgVal));
+
+    // Task 7:
+    // Get only first value from Observable.
+    console.log('task7: the first name');
+    this.firstFromSubscription = from(['Richard', 'Erlich', 'Dinesh', 'Gilfoyle'])
+      .pipe(first())
+      .subscribe((name: string) => console.log(name));
   }
 
   ngOnDestroy() {
@@ -85,5 +93,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.timeoutSubscription.unsubscribe();
     // Task 6:
     this.lgSubscription.unsubscribe();
+    // Task 7:
+    this.firstFromSubscription.unsubscribe();
   }
 }
