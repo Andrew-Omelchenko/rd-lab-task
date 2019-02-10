@@ -25,7 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log('task1: of() - unflattened');
     const ofSubscription = of(arr)
       .subscribe((arr: number[]) => {
-        for (let elem in arr) console.log(elem);
+        for (let element in arr) console.log(element);
       });
     this.subscriptions.push(ofSubscription);
 
@@ -61,8 +61,43 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     console.log('task4: from promise');
     const timeoutSubscription = from(promise)
-      .subscribe((result: string) => console.log('Async task4 result: ', result));
+      .subscribe((result: string) => console.log(`Async task4 result: ${result}`));
     this.subscriptions.push(timeoutSubscription);
+
+    // Task 5:
+    // Create simple 'hot' and 'cold' Observable.
+    // cold observable
+    const coldObservable: Observable<number> = Observable
+      .create((observer: Observer<number>) => {
+        observer.next(Math.random());
+      });
+    console.log('task5: cold observable');
+    // subscription 1
+    const coldSubscription1 = coldObservable.subscribe((data) => {
+      console.log(`cold data #1: ${data}`);
+    });
+    // subscription 2
+    const coldSubscription2 = coldObservable.subscribe((data) => {
+      console.log(`cold data #2: ${data}`);
+    });
+    this.subscriptions.push(coldSubscription1);
+    this.subscriptions.push(coldSubscription2);
+    // hot observable
+    const random: number = Math.random();
+    const hotObservable: Observable<number> = Observable.create((observer) => {
+      observer.next(random);
+    });
+    console.log('task5: hot observable');
+    // subscription 1
+    const hotSubscription1 = hotObservable.subscribe((data) => {
+      console.log(`hot data #1: ${data}`);
+    });
+    // subscription 2
+    const hotSubscription2 = hotObservable.subscribe((data) => {
+      console.log(`hot data #2: ${data}`);
+    });
+    this.subscriptions.push(hotSubscription1);
+    this.subscriptions.push(hotSubscription2);
 
     // Task 6:
     // Create observable of array, map each value to logarithm and show result in console.
@@ -150,7 +185,7 @@ export class AppComponent implements OnInit, OnDestroy {
             );
         })
       )
-      .subscribe((notification: Notification) => console.log(notification));
+      .subscribe((notification: Notification) => console.log(`task11 async item: `, notification));
     this.subscriptions.push(notificationsSubscription);
   }
 
