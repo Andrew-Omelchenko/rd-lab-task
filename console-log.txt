@@ -1,0 +1,41 @@
+task1: from() - flattened
+1
+2
+3
+task1: of() - unflattened
+0
+1
+2
+task2: combine and multiply
+50
+task3: mouse clicks
+task4: from promise
+task5: cold observable
+cold data #1: 0.014255145213506903
+cold data #2: 0.5961897030539649
+task5: hot observable
+hot data #1: 0.28301749531649145
+hot data #2: 0.28301749531649145
+task6: map each value to logarithm
+1
+2
+3
+task7: the first name
+Richard
+task8:
+task9: filter array of names
+Sally
+Steve
+task10: with error thrown
+good message: good
+good message: great
+good message: grand
+error thrown: catch me!
+task11:
+task11 async item:  {userId: 1, name: "A1", delay: 100}
+task11 async item:  {userId: 2, name: "B1", delay: 200}
+Async task4 result: resolved!
+task8 async value: 0.5
+task8 async value: 100
+task11 async item:  {userId: 1, name: "A4", delay: 3500}
+task11 async item:  {userId: 2, name: "B3", delay: 3500}
